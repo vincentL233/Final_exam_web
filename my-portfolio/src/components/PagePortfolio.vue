@@ -1,11 +1,16 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import axios from 'axios';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const projects = ref([
+// API Base URL
+const API_URL = 'http://localhost:8080';
+
+// 預設資料 (當後端沒有資料時使用)
+const defaultProjects = [
   {
     id: 1,
     title: "E-Commerce Redesign",
@@ -38,12 +43,31 @@ const projects = ref([
     image: "https://placehold.co/1200x800/7c2d12/fdba74?text=Smart+Home",
     description: "Centralized control interface for smart home devices with voice integration and energy monitoring."
   }
-]);
+];
 
+const projects = ref(defaultProjects);
 const wrapper = ref(null);
 let ctx;
 
-onMounted(() => {
+// 從後端獲取作品集資料
+const fetchPortfolio = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/portfolio`);
+    if (response.data && response.data.length > 0) {
+      projects.value = response.data;
+      console.log('Portfolio data loaded from server:', response.data);
+    } else {
+      console.log('Using default portfolio data (server returned empty)');
+    }
+  } catch (error) {
+    console.log('Using default portfolio data due to fetch error:', error.message);
+  }
+};
+
+onMounted(async () => {
+  // 先嘗試從後端獲取資料
+  await fetchPortfolio();
+  
   ctx = gsap.context(() => {
     const slides = gsap.utils.toArray('.slide');
     const totalSlides = slides.length;

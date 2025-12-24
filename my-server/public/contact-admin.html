@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 聯絡記錄管理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0284c7;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 1.25rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: top;
+        }
+        
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .message-cell {
+            max-width: 300px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        a {
+            color: #0284c7;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .date {
+            background: #f1f5f9;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        
+        .service-badge {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .service-badge.free {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(2, 132, 199, 0.3);
+            text-decoration: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #0284c7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 800px;
+            }
+            
+            th, td {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 聯絡記錄管理</h1>
+            <p class="subtitle">Contact Form Submissions</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">-</div>
+                    <div class="stat-label">總提交數</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>姓名</th>
+                        <th>Email</th>
+                        <th>服務類型</th>
+                        <th>訊息內容</th>
+                        <th>提交時間</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="contactsTableBody">
+                    <tr>
+                        <td colspan="7">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>載入中...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="refresh-btn" onclick="loadContacts()">🔄 重新整理</button>
+        </div>
+    </div>
+
+    <script>
+        // API 基礎路徑
+        const API_URL = window.location.origin;
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // 產生服務類型標籤
+        function getServiceBadge(service, price) {
+            const isFree = !price || price === 0;
+            const className = isFree ? 'service-badge free' : 'service-badge';
+            const text = service || 'General Inquiry';
+            return `<span class="${className}">${text}</span>`;
+        }
+        
+        // 載入聯絡記錄
+        async function loadContacts() {
+            const tbody = document.getElementById('contactsTableBody');
+            const totalCount = document.getElementById('totalCount');
+            
+            // 顯示載入中
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>載入中...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                const response = await fetch(`${API_URL}/contact`);
+                const contacts = await response.json();
+                
+                // 更新總數
+                totalCount.textContent = contacts.length;
+                
+                if (contacts.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    </svg>
+                                    <h3>目前沒有任何聯絡記錄</h3>
+                                    <p>當有人提交聯絡表單時，記錄會顯示在這裡</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // 依時間排序（新的在前）
+                contacts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // 產生表格列
+                let rows = '';
+                contacts.forEach((contact, index) => {
+                    rows += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${escapeHtml(contact.name) || 'N/A'}</strong></td>
+                            <td><a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email) || 'N/A'}</a></td>
+                            <td>${getServiceBadge(contact.service, contact.servicePrice)}</td>
+                            <td class="message-cell">${escapeHtml(contact.message) || 'N/A'}</td>
+                            <td><span class="date">${formatDate(contact.createdAt)}</span></td>
+                            <td><button class="delete-btn" onclick="deleteContact('${contact._id}')">刪除</button></td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = rows;
+                
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #dc2626; padding: 2rem;">
+                            載入失敗，請確認伺服器是否正在運行
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // 刪除聯絡記錄
+        async function deleteContact(id) {
+            if (!confirm('確定要刪除這筆記錄嗎？')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/contact/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadContacts(); // 重新載入
+                } else {
+                    alert('刪除失敗');
+                }
+            } catch (error) {
+                console.error('Error deleting contact:', error);
+                alert('刪除失敗：' + error.message);
+            }
+        }
+        
+        // 防止 XSS 攻擊
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 頁面載入時自動執行
+        document.addEventListener('DOMContentLoaded', loadContacts);
+    </script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ 訊息已送出</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);
+            padding: 3rem;
+            max-width: 500px;
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: bounceIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon svg {
+            width: 50px;
+            height: 50px;
+            color: white;
+        }
+
+        .checkmark {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: draw 0.6s ease-out 0.5s forwards;
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #065f46;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: #047857;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #065f46;
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #047857;
+            word-break: break-word;
+        }
+
+        .message-preview {
+            background: white;
+            border: 1px solid #d1fae5;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            color: #334155;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .footer-text {
+            margin-top: 2rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .service-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .service-badge.free {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        @media (max-width: 480px) {
+            .success-card {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .success-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .success-icon svg {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="success-card">
+        <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline class="checkmark" points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+
+        <h1>訊息已成功送出！</h1>
+        <p class="subtitle">感謝您的聯繫，我們會盡快回覆您。</p>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">姓名</span>
+                <span class="info-value">
+                    <%= contact.name %>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">
+                    <%= contact.email %>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">服務</span>
+                <span class="info-value">
+                    <span class="service-badge <%= contact.servicePrice === 0 ? 'free' : '' %>">
+                        <%= contact.service || 'General Inquiry' %>
+                    </span>
+                </span>
+            </div>
+            <div class="info-row" style="flex-direction: column;">
+                <span class="info-label" style="margin-bottom: 0.5rem;">訊息內容</span>
+                <div class="message-preview">
+                    <%= contact.message %>
+                </div>
+            </div>
+        </div>
+
+        <a href="http://localhost:5173" class="back-btn">
+            ← 返回首頁
+        </a>
+
+        <p class="footer-text">
+            提交時間：<%= new Date(contact.createdAt).toLocaleString('zh-TW') %>
+        </p>
+    </div>
+</body>
+
+</html>

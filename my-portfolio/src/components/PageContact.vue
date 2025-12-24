@@ -1,12 +1,27 @@
 <script setup>
 import { onMounted, ref, onUnmounted, computed, watch } from 'vue';
+import axios from 'axios';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// API Base URL
+const API_URL = 'http://localhost:8080';
+
 const infoRef = ref(null);
 let ctx;
+
+// --- Form Data State ---
+const formName = ref('');
+const formEmail = ref('');
+const formMessage = ref('');
+
+// --- Form Status State ---
+const isSubmitting = ref(false);
+const submitSuccess = ref(false);
+const submitError = ref('');
+const responseMessage = ref('');
 
 // --- Service Selection State ---
 const services = ref([
@@ -137,16 +152,62 @@ const formatCardCvv = (e) => {
   cardCvv.value = value;
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  // 重置狀態
+  submitError.value = '';
+  submitSuccess.value = false;
+  responseMessage.value = '';
+  
+  // 驗證表單
+  if (!formName.value.trim() || !formEmail.value.trim() || !formMessage.value.trim()) {
+    submitError.value = 'Please fill in all required fields.';
+    return;
+  }
+  
   if (selectedService.value.price > 0) {
     // Validate card details here
     if (!cardNumber.value || !cardName.value || !cardCvv.value) {
-      alert("Please fill in payment details.");
+      submitError.value = 'Please fill in payment details.';
       return;
     }
-    alert(`Processing payment of $${selectedService.value.price} for ${selectedService.value.title}...`);
-  } else {
-    alert("Inquiry Sent! We will get back to you soon.");
+  }
+  
+  // 開始提交
+  isSubmitting.value = true;
+  
+  try {
+    // 準備要發送的資料
+    const contactData = {
+      name: formName.value.trim(),
+      email: formEmail.value.trim(),
+      message: formMessage.value.trim(),
+      service: selectedService.value.title,
+      servicePrice: selectedService.value.price
+    };
+    
+    console.log('Sending contact data:', contactData);
+    
+    // 使用 axios 發送 POST 請求到後端
+    const response = await axios.post(`${API_URL}/contact`, contactData);
+    
+    console.log('Server response:', response.data);
+    
+    if (response.data.success) {
+      // 取得新建立的聯絡記錄 ID
+      const contactId = response.data.data._id;
+      
+      // 跳轉到後端的 EJS 成功頁面
+      window.location.href = `${API_URL}/contact-success/${contactId}`;
+      return; // 跳轉後不需要執行後續程式碼
+    } else {
+      submitError.value = response.data.message || 'Something went wrong. Please try again.';
+    }
+    
+  } catch (error) {
+    console.error('Error submitting contact form:', error);
+    submitError.value = error.response?.data?.message || 'Network error. Please check your connection and try again.';
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
@@ -245,19 +306,34 @@ onUnmounted(() => {
         <!-- Right Column: Form + Payment -->
         <div class="contact-form-wrapper">
           <form @submit.prevent="handleSubmit" class="main-form">
+            <!-- Success Message -->
+            <transition name="slide-fade-up">
+              <div v-if="submitSuccess" class="success-message">
+                <div class="success-icon">✓</div>
+                <p>{{ responseMessage }}</p>
+              </div>
+            </transition>
+            
+            <!-- Error Message -->
+            <transition name="slide-fade-up">
+              <div v-if="submitError" class="error-message">
+                <p>{{ submitError }}</p>
+              </div>
+            </transition>
+            
             <!-- Basic Info -->
             <div class="form-section-title">Your Details</div>
             <div class="form-group">
               <label>Name</label>
-              <input type="text" placeholder="John Doe" required>
+              <input type="text" v-model="formName" placeholder="John Doe" required :disabled="isSubmitting">
             </div>
             <div class="form-group">
               <label>Email</label>
-              <input type="email" placeholder="john@example.com" required>
+              <input type="email" v-model="formEmail" placeholder="john@example.com" required :disabled="isSubmitting">
             </div>
             <div class="form-group">
               <label>Message</label>
-              <textarea rows="4" placeholder="Tell me about your project..." required></textarea>
+              <textarea rows="4" v-model="formMessage" placeholder="Tell me about your project..." required :disabled="isSubmitting"></textarea>
             </div>
 
             <!-- Payment Section (Conditional) -->
@@ -396,10 +472,11 @@ onUnmounted(() => {
             </transition>
 
             <div class="form-group submit-group">
-              <button type="submit" class="submit-btn">
-                <span v-if="selectedService.price > 0">Pay ${{ selectedService.price }} & Send</span>
+              <button type="submit" class="submit-btn" :disabled="isSubmitting" :class="{ 'loading': isSubmitting }">
+                <span v-if="isSubmitting" class="spinner"></span>
+                <span v-else-if="selectedService.price > 0">Pay ${{ selectedService.price }} & Send</span>
                 <span v-else>Send Message</span>
-                <span class="arrow">→</span>
+                <span v-if="!isSubmitting" class="arrow">→</span>
               </button>
             </div>
           </form>
@@ -665,7 +742,77 @@ onUnmounted(() => {
   transform: translateY(-2px);
 }
 
-/* --- Credit Card CSS Assets (No Images) --- */
+.submit-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-btn.loading {
+  background: #64748b;
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Success Message */
+.success-message {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+}
+
+.success-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.success-message p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Error Message */
+.error-message {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+}
+
+.error-message p {
+  margin: 0;
+  font-size: 0.95rem;
+}
 .payment-section {
   margin-top: 3rem;
   padding-top: 2rem;
