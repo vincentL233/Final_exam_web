@@ -4,6 +4,7 @@ import PageService from '../components/PageService.vue'
 import PagePortfolio from '@/components/PagePortfolio.vue'
 import PageAbout from '@/components/PageAbout.vue' 
 import PageContact from '@/components/PageContact.vue'
+import PageCamera from '@/components/PageCamera.vue'
 
 
 const router = createRouter({
@@ -33,6 +34,11 @@ const router = createRouter({
       path:'/contact',
       name:'contact',
       component: PageContact
+    },
+    {
+        path: '/camera',
+        name: 'camera',
+        component: PageCamera
     }
   ],
 })
