@@ -6,7 +6,7 @@ const currentYear = new Date().getFullYear();
 const ctaTitleRef = ref(null);
 
 onMounted(() => {
-  // GSAP Gradient Text Flow Animation
+  // GSAP 漸變文字流動動畫
   gsap.to(ctaTitleRef.value, {
     backgroundPosition: "200% center",
     duration: 3, // Faster for more visible effect

@@ -439,21 +439,6 @@ ul {
   box-shadow: none !important;
 }
 
-.logo-icon {
-  color: #3b82f6;
-  transition: transform 0.3s ease;
-}
-.brand-logo:hover .logo-icon {
-  transform: rotate(-10deg) scale(1.1);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 /* 網站名稱樣式 */
 .brand-text {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -469,8 +454,6 @@ ul {
   display: flex;
   align-items: center;
 }
-
-
 
 .hamburger-btn {
   cursor: pointer;

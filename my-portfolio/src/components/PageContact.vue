@@ -6,24 +6,24 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// API Base URL
+// API 基礎 URL
 const API_URL = 'http://localhost:8080';
 
 const infoRef = ref(null);
 let ctx;
 
-// --- Form Data State ---
+// --- 表單資料狀態 ---
 const formName = ref('');
 const formEmail = ref('');
 const formMessage = ref('');
 
-// --- Form Status State ---
+// --- 表單提交狀態 ---
 const isSubmitting = ref(false);
 const submitSuccess = ref(false);
 const submitError = ref('');
 const responseMessage = ref('');
 
-// --- Service Selection State ---
+// --- 服務選擇狀態 ---
 const services = ref([
   { id: 'inquiry', title: 'General Inquiry', price: 0, desc: 'Questions, collaborations, or just saying hi.' },
   { id: 'consult', title: 'Tech Consultation', price: 50, desc: '1-hour deep dive into your technical challenges.' },
@@ -33,13 +33,13 @@ const selectedService = ref(services.value[0]);
 
 const selectService = (service) => {
   selectedService.value = service;
-  // Reset card form if switching to free
+  // 如果切換到免費服務，重置信用卡表單
   if (service.price === 0) {
     isCardFlipped.value = false;
   }
 };
 
-// --- Credit Card State ---
+// --- 信用卡狀態 ---
 const cardName = ref("");
 const cardNumber = ref("");
 const cardMonth = ref("");
@@ -52,13 +52,13 @@ const isCardFlipped = ref(false);
 const focusElementStyle = ref(null);
 const isInputFocused = ref(false);
 
-// Refs for focus element positioning
+// 焦點元素定位的 Refs
 const cardNumberLabel = ref(null);
 const cardNameLabel = ref(null);
 const cardDateLabel = ref(null);
 const focusElement = ref(null);
 
-// Computed
+// 計算屬性
 const getCardType = computed(() => {
   let number = cardNumber.value;
   let re = new RegExp("^4");
@@ -73,7 +73,7 @@ const getCardType = computed(() => {
   re = new RegExp("^6011");
   if (number.match(re) != null) return "discover";
   
-  return "visa"; // default type
+  return "visa"; // 預設類型
 });
 
 const generateCardNumberMask = computed(() => {
@@ -89,14 +89,14 @@ const formattedCardName = computed(() => {
   return cardName.value.replace(/\s\s+/g, ' ');
 });
 
-// Watch
+// 監聽器
 watch(cardYear, () => {
   if (cardMonth.value < minCardMonth.value) {
     cardMonth.value = "";
   }
 });
 
-// Methods
+// 方法
 const flipCard = (status) => {
   isCardFlipped.value = status;
 };
@@ -165,7 +165,7 @@ const handleSubmit = async () => {
   }
   
   if (selectedService.value.price > 0) {
-    // Validate card details here
+    // 這裡驗證信用卡詳細資訊
     if (!cardNumber.value || !cardName.value || !cardCvv.value) {
       submitError.value = 'Please fill in payment details.';
       return;
@@ -211,11 +211,9 @@ const handleSubmit = async () => {
   }
 };
 
-onMounted(() => {
-  cardNumber.value = ""; // Initialize
-  
-  ctx = gsap.context(() => {
-    // Title Animation
+const initAnimations = () => {
+    ctx = gsap.context(() => {
+    // 標題動畫
     gsap.from(".contact-title span", {
       y: 100,
       opacity: 0,
@@ -224,7 +222,7 @@ onMounted(() => {
       ease: "power4.out",
     });
 
-    // Service Cards Stagger
+    // 服務卡片交錯動畫
     gsap.from(".service-card", {
       y: 30,
       duration: 0.6,
@@ -234,7 +232,7 @@ onMounted(() => {
       clearProps: "all"
     });
 
-    // Form Fade Up
+    // 表單淡入向上動畫
     gsap.from(".contact-form-wrapper", {
       y: 50,
       opacity: 0,
@@ -243,6 +241,11 @@ onMounted(() => {
       delay: 0.6,
     });
   });
+}
+
+onMounted(() => {
+  cardNumber.value = ""; // 初始化
+  initAnimations();
 });
 
 onUnmounted(() => {

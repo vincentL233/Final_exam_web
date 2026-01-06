@@ -241,25 +241,35 @@ const handleMouseLeave = () => {
     mouse.y = null;
 }
 
-onMounted(() => {
+const initCanvas = () => {
     if (canvasRef.value) {
         ctx = canvasRef.value.getContext('2d');
         canvasRef.value.width = window.innerWidth;
         canvasRef.value.height = window.innerHeight;
         initParticles(window.innerWidth, window.innerHeight);
         animate();
-        
-        window.addEventListener('resize', handleResize);
-        // 監聽整個 window 的滑鼠移動，或者只監聽 canvas 區域
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseout', handleMouseLeave);
     }
-});
+};
 
-onUnmounted(() => {
+const addEventListeners = () => {
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseout', handleMouseLeave);
+};
+
+const removeEventListeners = () => {
     window.removeEventListener('resize', handleResize);
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseout', handleMouseLeave);
+};
+
+onMounted(() => {
+    initCanvas();
+    addEventListeners();
+});
+
+onUnmounted(() => {
+    removeEventListeners();
     cancelAnimationFrame(animationFrameId);
 });
 </script>

@@ -1,14 +1,15 @@
 <script setup>
-// 這裡就像以前你在 <script> 裡寫的 setup() 或 data/methods
+  // 引入全局組件
   import Header from './components/PageHeader.vue'
   import Footer from './components/PageFooter.vue'
 </script>
 
 <template>
-  <!-- 這裡就是 HTML 模板 -->
+  <!-- 頁首導航 -->
   <Header></Header>
-  <!-- 這是路由出口，之後切換頁面內容會顯示在這裡 -->
+  <!-- 路由視圖：頁面內容將渲染於此 -->
   <router-view />
+  <!-- 頁尾資訊 -->
   <Footer></Footer>
 </template>
 

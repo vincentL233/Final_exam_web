@@ -154,7 +154,7 @@ const closeCard = () => {
   }, 0);
 };
 
-onMounted(async () => {
+const fetchServices = async () => {
   try {
     // 嘗試從後端 API 獲取資料，如果失敗則使用預設假資料
     const response = await fetch('http://localhost:8080/services');
@@ -167,53 +167,59 @@ onMounted(async () => {
   } catch (error) {
     console.log('Using default services data due to fetch error:', error);
   }
+};
 
-  // 等待 DOM 更新後再執行進場動畫
-  setTimeout(() => {
-    // 確保元素存在才執行動畫
-    if (cardsRef.value.length > 0) {
-        // 標題進場動畫
-        gsap.from('.service-title-group', {
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            ease: 'power3.out'
-        });
+const initAnimations = () => {
+  // 確保元素存在才執行動畫
+  if (cardsRef.value.length > 0) {
+    // 標題進場動畫
+    gsap.from('.service-title-group', {
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out'
+    });
 
-        // 卡片依序進場動畫
-        gsap.from(cardsRef.value, {
-            y: 100,
+    // 卡片依序進場動畫
+    gsap.from(cardsRef.value, {
+      y: 100,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      delay: 0.3,
+      ease: 'back.out(1.7)',
+      clearProps: 'all' // 動畫結束後清除屬性，避免干擾
+    });
+
+    // Workflow 區域滾動觸發動畫
+    const workflowObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          gsap.from('.step-content', {
+            y: 60,
             opacity: 0,
             duration: 0.8,
-            stagger: 0.15,
-            delay: 0.3,
-            ease: 'back.out(1.7)',
-            clearProps: 'all' // 動畫結束後清除屬性，避免干擾
-        });
-
-        // Workflow 區域滾動觸發動畫
-        const workflowObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    gsap.from('.step-content', {
-                        y: 60,
-                        opacity: 0,
-                        duration: 0.8,
-                        stagger: 0.2,
-                        ease: 'power3.out',
-                        clearProps: 'all'
-                    });
-                    workflowObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-
-        const workflowSection = document.querySelector('.workflow-section');
-        if (workflowSection) {
-            workflowObserver.observe(workflowSection);
+            stagger: 0.2,
+            ease: 'power3.out',
+            clearProps: 'all'
+          });
+          workflowObserver.unobserve(entry.target);
         }
+      });
+    }, { threshold: 0.2 });
+
+    const workflowSection = document.querySelector('.workflow-section');
+    if (workflowSection) {
+      workflowObserver.observe(workflowSection);
     }
-  }, 300); // 增加延遲時間，確保資料已渲染
+  }
+};
+
+onMounted(async () => {
+  await fetchServices();
+  
+  // 等待 DOM 更新後再執行進場動畫
+  setTimeout(initAnimations, 300); // 增加延遲時間，確保資料已渲染
 });
 </script>
 

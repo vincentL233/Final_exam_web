@@ -1,10 +1,17 @@
 <script setup>
+// ==========================================
+// 模組與設定 (Imports & Config)
+// ==========================================
 import { onMounted, ref, onUnmounted, onBeforeUpdate } from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Draggable } from 'gsap/Draggable';
 
 gsap.registerPlugin(ScrollTrigger, Draggable);
+
+// ==========================================
+// 資料與內容 (Data & Content)
+// ==========================================
 
 const skills = [
   { name: "Frontend Development", items: ["Vue.js", "React", "GSAP", "Tailwind CSS"] },
@@ -18,21 +25,29 @@ const baseExperiences = [
   { year: "2019 - 2021", role: "Junior Developer", company: "StartUp Hub", desc: "Collaborated with cross-functional teams to deliver MVP products." }
 ];
 
-// Duplicate data for infinite loop
+// 重複資料以實現無限循環效果
 const experiences = ref([...baseExperiences, ...baseExperiences, ...baseExperiences, ...baseExperiences]);
 
+// ==========================================
+// DOM 元素參考 (Refs & DOM Elements)
+// ==========================================
+
 const horizontalWrapper = ref(null);
-const experienceSection = ref(null);
 const scrollContainer = ref(null);
 const cardRefs = ref([]);
 const scannerRef = ref(null);
-let ctx;
-let updateScanner; // Define in outer scope
 
-onMounted(() => {
-  ctx = gsap.context(() => {
-    
-    // 1. Hero Parallax
+let ctx;
+let updateScanner; // 定義在外部範圍以便稍後清理
+
+// ==========================================
+// 動畫函式 (Animation Functions)
+// ==========================================
+
+/**
+ * 1. Hero 區塊的視差效果 (Hero Parallax Effect)
+ */
+const initHeroParallax = () => {
     gsap.to(".hero-image-wrapper", {
       yPercent: 50,
       ease: "none",
@@ -54,94 +69,87 @@ onMounted(() => {
         scrub: true
       }
     });
+};
 
-    // 2. Infinite Horizontal Loop with Drag & Inertia (GSAP Native)
-    if (scrollContainer.value && horizontalWrapper.value) {
-      const container = scrollContainer.value;
-      const totalWidth = container.scrollWidth;
-      const singleSetWidth = totalWidth / 4; // Since we have 4 sets
+/**
+ * 2. 具備拖曳功能的無限水平滾動 (Infinite Horizontal Loop with Drag)
+ */
+const initInfiniteLoop = () => {
+    if (!scrollContainer.value || !horizontalWrapper.value) return;
+
+    const container = scrollContainer.value;
+    const totalWidth = container.scrollWidth;
+    const singleSetWidth = totalWidth / 4; 
       
-      // Create the infinite looping animation
-      // We animate from 0 to -singleSetWidth, then it repeats.
-      const loopAnim = gsap.to(container, {
-        x: -singleSetWidth,
-        duration: 20, // Adjust speed here (seconds per cycle)
-        ease: "none",
-        repeat: -1,
-        paused: false
-      });
+    // 建立無限循環動畫
+    const loopAnim = gsap.to(container, {
+      x: -singleSetWidth,
+      duration: 20, 
+      ease: "none",
+      repeat: -1,
+      paused: false
+    });
 
-      // Draggable Proxy
-      const proxy = document.createElement("div");
+    // 拖曳代理元素
+    const proxy = document.createElement("div");
       
-      Draggable.create(proxy, {
-        trigger: horizontalWrapper.value,
-        type: "x",
-        onPress() {
-          loopAnim.pause();
-          horizontalWrapper.value.style.cursor = "grabbing";
-        },
-        onDrag() {
-          // Convert drag pixels to time
-          // speed = distance / time => time = distance / speed
-          // speed of animation = singleSetWidth / duration
-          const pxPerSecond = singleSetWidth / 20;
-          const timeDelta = -this.deltaX / pxPerSecond;
-          
-          loopAnim.totalTime(loopAnim.totalTime() + timeDelta);
-        },
-        onRelease() {
-          loopAnim.play();
-          horizontalWrapper.value.style.cursor = "grab";
-        }
-      });
-    }
+    Draggable.create(proxy, {
+      trigger: horizontalWrapper.value,
+      type: "x",
+      onPress() {
+        loopAnim.pause();
+        horizontalWrapper.value.style.cursor = "grabbing";
+      },
+      onDrag() {
+        const pxPerSecond = singleSetWidth / 20;
+        const timeDelta = -this.deltaX / pxPerSecond;
+        loopAnim.totalTime(loopAnim.totalTime() + timeDelta);
+      },
+      onRelease() {
+        loopAnim.play();
+        horizontalWrapper.value.style.cursor = "grab";
+      }
+    });
+};
 
-    // Scanner Effect Logic
+/**
+ * 3. 掃描器特效邏輯 (Scanner Effect Logic)
+ */
+const initScannerEffect = () => {
     updateScanner = () => {
       if (!scannerRef.value) return;
       
       const scannerRect = scannerRef.value.getBoundingClientRect();
       const scannerCenter = scannerRect.left + scannerRect.width / 2;
-
-      // Ensure cardRefs is an array
       const cards = Array.isArray(cardRefs.value) ? cardRefs.value : [];
 
       cards.forEach(card => {
         if (!card) return;
         const rect = card.getBoundingClientRect();
-        const cardLeft = rect.left;
-        const cardWidth = rect.width;
-        const cardRight = rect.right;
-
-        // Calculate intersection
+        
+        // 計算交集位置
         let revealPercentage = 0;
-
-        if (cardRight < scannerCenter) {
-          // Card has fully passed the scanner (is to the left) -> Show Code (100% revealed)
+        if (rect.right < scannerCenter) {
           revealPercentage = 100;
-        } else if (cardLeft > scannerCenter) {
-          // Card has not yet reached the scanner (is to the right) -> Show UI (0% revealed)
+        } else if (rect.left > scannerCenter) {
           revealPercentage = 0;
         } else {
-          // Card is crossing the scanner
-          const distancePastScanner = scannerCenter - cardLeft;
-          revealPercentage = (distancePastScanner / cardWidth) * 100;
+          const distancePastScanner = scannerCenter - rect.left;
+          revealPercentage = (distancePastScanner / rect.width) * 100;
         }
 
-        // Clamp percentage between 0 and 100
         revealPercentage = Math.max(0, Math.min(100, revealPercentage));
-
         card.style.setProperty('--reveal-pos', `${revealPercentage}%`);
       });
     };
 
-    // Use GSAP ticker for smoother updates synchronized with scroll
     gsap.ticker.add(updateScanner);
+};
 
-    // 3. Floating Shapes Parallax
-
-    // 3. Floating Shapes Parallax
+/**
+ * 4. 浮動形狀視差 (Floating Shapes Parallax)
+ */
+const initFloatingShapes = () => {
     gsap.utils.toArray(".floating-shape").forEach((shape, i) => {
       gsap.to(shape, {
         y: (i + 1) * 200,
@@ -155,8 +163,12 @@ onMounted(() => {
         }
       });
     });
+};
 
-    // 4. Philosophy Section (Apple-style Text Reveal)
+/**
+ * 5. 理念區塊 (Apple 風格文字揭示) (Philosophy Section)
+ */
+const initPhilosophySection = () => {
     const philosophyTl = gsap.timeline({
       scrollTrigger: {
         trigger: ".philosophy-section",
@@ -170,24 +182,25 @@ onMounted(() => {
     const phrases = gsap.utils.toArray(".philosophy-text");
     
     phrases.forEach((phrase, i) => {
-      // Fade in
       philosophyTl.fromTo(phrase, 
         { opacity: 0, y: 100, filter: "blur(10px)" },
         { opacity: 1, y: 0, filter: "blur(0px)", duration: 1, ease: "power2.out" }
       );
       
-      // Hold
       philosophyTl.to(phrase, { duration: 1 }); 
 
-      // Fade out (unless it's the last one)
       if (i < phrases.length - 1) {
         philosophyTl.to(phrase, 
           { opacity: 0, y: -100, filter: "blur(10px)", duration: 1, ease: "power2.in" }
         );
       }
     });
+};
 
-    // Initial Hero Animation
+/**
+ * 6. Hero 與通用進場動畫 (Hero & General Animations)
+ */
+const initHeroAnimation = () => {
     gsap.from(".hero-title", {
       y: 100,
       opacity: 0,
@@ -203,8 +216,9 @@ onMounted(() => {
       ease: "power2.out",
       delay: 0.4
     });
+};
 
-    // 5. General Fade Up Animations
+const initFadeUpAnimations = () => {
     gsap.utils.toArray('.fade-up').forEach(el => {
       gsap.from(el, {
         scrollTrigger: {
@@ -218,7 +232,21 @@ onMounted(() => {
         ease: "power2.out"
       });
     });
+};
 
+// ==========================================
+// 生命週期鉤子 (Lifecycle Hooks)
+// ==========================================
+
+onMounted(() => {
+  ctx = gsap.context(() => {
+    initHeroParallax();
+    initInfiniteLoop();
+    initScannerEffect();
+    initFloatingShapes();
+    initPhilosophySection();
+    initHeroAnimation();
+    initFadeUpAnimations();
   });
 });
 
@@ -236,14 +264,14 @@ onUnmounted(() => {
 
 <template>
   <div class="about-page">
-    <!-- Floating Background Shapes -->
+    <!-- 浮動背景形狀 -->
     <div class="floating-shape shape-1"></div>
     <div class="floating-shape shape-2"></div>
     <div class="floating-shape shape-3"></div>
 
     <div class="container">
       
-      <!-- Hero Section -->
+      <!-- 主視覺區塊 (Hero Section) -->
       <section class="hero-section">
         <div class="hero-content">
           <h1 class="hero-title">
@@ -260,7 +288,7 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <!-- Bio Section -->
+      <!-- 個人簡介區塊 (Bio Section) -->
       <section class="bio-section fade-up">
         <div class="section-header">
           <span class="section-label">01 / Biography</span>
@@ -280,7 +308,7 @@ onUnmounted(() => {
 
     </div>
 
-    <!-- Philosophy Section (Apple Style) -->
+    <!-- 設計哲學區塊 (Philosophy Section) -->
     <section class="philosophy-section">
       <div class="philosophy-content">
         <h2 class="philosophy-text">Design is not just what it looks like.</h2>
@@ -290,9 +318,9 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Experience Section (Full Width for Horizontal Scroll) -->
-    <section class="experience-section" ref="experienceSection">
-      <!-- Scanner Line -->
+    <!-- 經歷區塊 (Experience Section - 包含水平滾動) -->
+    <section class="experience-section">
+      <!-- 掃描線特效 -->
       <div class="scanner" ref="scannerRef"></div>
 
       <div class="container section-header-wrapper">
@@ -311,7 +339,7 @@ onUnmounted(() => {
             class="exp-card"
             ref="cardRefs"
           >
-            <!-- Normal Layer (UI) -->
+            <!-- 一般層 (UI 顯示) -->
             <div class="card-normal">
               <div class="exp-year">{{ exp.year }}</div>
               <div class="exp-content">
@@ -322,7 +350,7 @@ onUnmounted(() => {
               <div class="exp-number">0{{ index + 1 }}</div>
             </div>
 
-            <!-- Revealed Layer (Code/ASCII) -->
+            <!-- 揭示層 (程式碼/ASCII 風格) -->
             <div class="card-revealed">
               <div class="code-content">
                 <pre>
@@ -343,7 +371,7 @@ onUnmounted(() => {
     </section>
 
     <div class="container">
-      <!-- Skills Section -->
+      <!-- 技能區塊 (Skills Section) -->
       <section class="skills-section fade-up">
         <div class="section-header">
           <span class="section-label">03 / Skills</span>

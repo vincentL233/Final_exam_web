@@ -64,41 +64,38 @@ const fetchPortfolio = async () => {
   }
 };
 
-onMounted(async () => {
-  // 先嘗試從後端獲取資料
-  await fetchPortfolio();
-  
+const initAnimations = () => {
   ctx = gsap.context(() => {
     const slides = gsap.utils.toArray('.slide');
     const totalSlides = slides.length;
 
-    // Initialize slides: Hide all except the first one
+    // 初始化幻燈片：隱藏除第一張以外的所有幻燈片
     gsap.set(slides, { autoAlpha: 0, zIndex: (i) => i });
     gsap.set(slides[0], { autoAlpha: 1 });
 
-    // Create a single master timeline for the entire pinned section
+    // 為整個固定區域建立單一主時間軸
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrapper.value,
         start: "top top",
         end: `+=${totalSlides * 100}%`,
         pin: true,
-        scrub: 1, // Smooth scrubbing
+        scrub: 1, // 平滑滾動
       }
     });
 
     slides.forEach((slide, i) => {
-      if (i === totalSlides - 1) return; // Last slide stays visible
+      if (i === totalSlides - 1) return; // 最後一張幻燈片保持可見
 
       const nextSlide = slides[i + 1];
       
-      // Define the start time for this transition in the master timeline
-      // We use absolute positioning in the timeline to stack them sequentially
+      // 定義此過渡在主時間軸中的開始時間
+      // 我們在時間軸中使用絕對定位來依序堆疊它們
       const startTime = i; 
 
-      // 1. Current Slide Exit
-      // REMOVED: Do not fade out the current slide image. 
-      // Keeping it fully visible ensures no gaps during the grid flip transition.
+      // 1. 當前幻燈片退出
+      // 移除：不要淡出當前幻燈片圖片。
+      // 保持完全可見以確保網格翻轉過渡期間無空隙。
       tl.to(slide.querySelector('.text-wrapper'), {
         y: -50,
         opacity: 0,
@@ -106,21 +103,21 @@ onMounted(async () => {
         ease: 'power2.in'
       }, startTime);
       
-      // 2. Next Slide Reveal
-      // Make next slide visible immediately at start of transition
+      // 2. 下一張幻燈片揭示
+      // 在過渡開始時立即顯示下一張幻燈片
       tl.set(nextSlide, { autoAlpha: 1 }, startTime);
       
-      // Hide real image initially
+      // 初始隱藏真實圖片
       tl.set(nextSlide.querySelector('.project-img'), { opacity: 0 }, startTime);
       
       const gridCells = nextSlide.querySelectorAll('.grid-cell');
       
-      // Animate Grid Cells
+      // 動畫化網格單元
       tl.fromTo(gridCells, 
         { 
           opacity: 0,
-          rotationY: 90, // Start from edge-on (90deg) so they appear immediately
-          scale: 0.5 // Start slightly smaller
+          rotationY: 90, // 從邊緣 (90度) 開始，以便它們立即出現
+          scale: 0.5 // 初始稍微縮小
         },
         { 
           opacity: 1,
@@ -136,10 +133,10 @@ onMounted(async () => {
         }, 
         startTime
       )
-      // Fade in real image at the end
+      // 最後淡入真實圖片
       .to(nextSlide.querySelector('.project-img'), { opacity: 1, duration: 0.2 }, startTime + 0.9);
 
-      // 3. Next Slide Content Entrance
+      // 3. 下一張幻燈片內容進入
       tl.fromTo(nextSlide.querySelector('.text-wrapper'), 
         { y: 50, opacity: 0 },
         {
@@ -154,6 +151,14 @@ onMounted(async () => {
     });
 
   }, wrapper.value);
+};
+
+onMounted(async () => {
+  // 先嘗試從後端獲取資料
+  await fetchPortfolio();
+  
+  // 初始化動畫
+  initAnimations();
 });
 
 onUnmounted(() => {
