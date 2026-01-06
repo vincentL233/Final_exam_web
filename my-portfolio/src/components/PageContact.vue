@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // API 基礎 URL
-const API_URL = 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const infoRef = ref(null);
 let ctx;

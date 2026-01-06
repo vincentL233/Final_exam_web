@@ -1,4 +1,5 @@
 var express = require('express');
+var path = require('path');
 var bodyParser = require('body-parser');
 var cors = require('cors'); // [新增] 讓 Vue 可以跨網域請求
 var fileupload = require('express-fileupload');
@@ -18,6 +19,10 @@ server.use(express.json());
 
 // 保留原本的設定
 server.use(express.static(__dirname + "/public"));
+
+// [新增] 部署: 設定 Vue 靜態檔案目錄 (../my-portfolio/dist)
+server.use(express.static(path.join(__dirname, '../my-portfolio/dist')));
+
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(fileupload({ limits: { fileSize: 2 * 1024 * 1024 } }));
 
@@ -26,10 +31,6 @@ var ServerDB = DB.create(__dirname + "/Service.db");
 var portfolioDB = DB.create(__dirname + "/portfolio.db");
 var contactDB = DB.create(__dirname + "/contact.db");
 
-// 測試路由
-server.get("/", (req, res) => {
-    res.send("API Server is running!");
-});
 
 // ============ Services API ============
 // 取得服務列表
@@ -228,6 +229,11 @@ server.delete("/contact/:id", async (req, res) => {
         console.error("Error deleting contact:", error);
         res.status(500).json({ success: false, message: "Server Error" });
     }
+});
+
+// [新增] 前端路由支援: 當 API 沒接到請求時，回傳 index.html
+server.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../my-portfolio/dist/index.html'));
 });
 
 server.listen(8080, () => {

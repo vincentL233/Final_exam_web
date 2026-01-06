@@ -1,4 +1,12 @@
 {
+  "name": "final-exam-web-root",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node my-server/server.js",
+    "install-server": "cd my-server && npm install",
+    "build-client": "cd my-portfolio && npm install && npm run build",
+    "build": "npm run install-server && npm run build-client"
+  },
   "dependencies": {
     "bootstrap-icons": "^1.13.1"
   }

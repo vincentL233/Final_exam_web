@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // API Base URL
-const API_URL = 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 // 預設資料 (當後端沒有資料時使用)
 const defaultProjects = [

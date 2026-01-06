@@ -157,7 +157,7 @@ const closeCard = () => {
 const fetchServices = async () => {
   try {
     // 嘗試從後端 API 獲取資料，如果失敗則使用預設假資料
-    const response = await fetch('http://localhost:8080/services');
+    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/services`);
     if (response.ok) {
       const data = await response.json();
       if (data && data.length > 0) {
