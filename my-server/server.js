@@ -232,7 +232,7 @@ server.delete("/contact/:id", async (req, res) => {
 });
 
 // [新增] 前端路由支援: 當 API 沒接到請求時，回傳 index.html
-server.get('*', (req, res) => {
+server.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../my-portfolio/dist/index.html'));
 });
 
