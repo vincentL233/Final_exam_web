@@ -215,7 +215,7 @@ server.post("/contact-with-file", async (req, res) => {
     }
 });
 
-// 刪除聯絡記錄 (可選)
+// 刪除聯絡記錄 
 server.delete("/contact/:id", async (req, res) => {
     try {
         const numRemoved = await contactDB.remove({ _id: req.params.id });
