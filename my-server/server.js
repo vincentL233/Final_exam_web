@@ -7,17 +7,13 @@ var DB = require("nedb-promises");
 
 var server = express();
 
-// [新增] 設定 EJS 模板引擎
 server.set('view engine', 'ejs');
 server.set('views', __dirname + '/views');
 
-// [新增] 啟用 CORS，允許所有來源連線 (開發方便)
 server.use(cors());
 
-// [新增] 解析 JSON 格式的請求 (Vue 預設送 JSON)
 server.use(express.json());
 
-// 保留原本的設定
 server.use(express.static(__dirname + "/public"));
 
 // [新增] 部署: 設定 Vue 靜態檔案目錄 (../my-portfolio/dist)
