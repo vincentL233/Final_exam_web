@@ -1,33 +1,9 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import gsap from 'gsap';
+import axios from 'axios';
 
-const services = ref([
-  {
-    id: 1,
-    title: 'Web Development',
-    description: 'Building fast, responsive, and scalable websites using modern technologies like Vue.js, React, and Node.js.',
-    icon: 'code'
-  },
-  {
-    id: 2,
-    title: 'UI/UX Design',
-    description: 'Creating intuitive and visually appealing user interfaces that provide seamless and enjoyable user experiences.',
-    icon: 'palette'
-  },
-  {
-    id: 3,
-    title: 'Mobile Solutions',
-    description: 'Developing cross-platform mobile applications that run smoothly on both iOS and Android devices.',
-    icon: 'mobile'
-  },
-  {
-    id: 4,
-    title: 'SEO Optimization',
-    description: 'Improving your website visibility on search engines to drive organic traffic and grow your business.',
-    icon: 'chart'
-  }
-]);
+const services = ref([]);
 
 const sectionRef = ref(null);
 // 使用 ref 陣列來收集所有卡片元素
@@ -154,19 +130,16 @@ const closeCard = () => {
   }, 0);
 };
 
-const fetchServices = async () => {
-  try {
-    // 嘗試從後端 API 獲取資料，如果失敗則使用預設假資料
-    const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/services`);
-    if (response.ok) {
-      const data = await response.json();
-      if (data && data.length > 0) {
-        services.value = data;
+const fetchServices = () => {
+  axios.get(`${import.meta.env.VITE_API_URL || ''}/services`)
+    .then(response => {
+      if (response.data && response.data.length > 0) {
+        services.value = response.data;
       }
-    }
-  } catch (error) {
-    console.log('Using default services data due to fetch error:', error);
-  }
+    })
+    .catch(error => {
+      console.error('Error fetching services:', error);
+    });
 };
 
 const initAnimations = () => {

@@ -78,7 +78,7 @@ const footerLinks = [
                 <nav class="footer-nav mb-3">
                     <a v-for="link in footerLinks" :key="link" href="#" class="footer-nav-link">{{ link }}</a>
                 </nav>
-                <p class="copyright m-0 text-white-50 small">&copy; {{ currentYear }} MyPortfolio. All rights reserved.</p>
+                <p class="copyright m-0 text-white-50 small">&copy; {{ currentYear }} DDjun. All rights reserved.</p>
             </div>
         </div>
       </div>
@@ -88,18 +88,18 @@ const footerLinks = [
 
 <style scoped>
 .footer-wrapper {
-  background-color: #0a0f1e; /* Match Header Black */
-  padding: 0 0 40px; /* Remove top padding as waves take space */
+  background-color: #0a0f1e; 
+  padding: 0 0 40px; 
   color: white;
   position: relative;
-  margin-top: 0; /* Remove margin, let waves overlap naturally */
-  z-index: 2; /* Ensure footer waves sit on top of main content */
+  margin-top: 0; 
+  z-index: 2; 
 }
 
-/* Waves Animation */
+
 .waves-container {
   position: absolute;
-  top: -100px; /* Move waves up to sit on top of footer */
+  top: -100px;
   left: 0;
   width: 100%;
   height: 100px;
@@ -111,7 +111,7 @@ const footerLinks = [
   position: relative;
   width: 100%;
   height: 100%;
-  margin-bottom: -7px; /* Fix for safari gap */
+  margin-bottom: -7px; 
 }
 
 .parallax > use {
@@ -146,17 +146,15 @@ const footerLinks = [
 /* CTA Section */
 .cta-section {
   margin-bottom: 80px;
-  padding-top: 80px; /* Increased spacing from waves */
+  padding-top: 80px; 
 }
 
 .cta-title {
   font-size: 3.5rem;
   font-weight: 800;
   letter-spacing: -1px;
-  margin-bottom: 2.5rem; /* Increased margin */
-  padding-bottom: 0.2em; /* Prevent descender clipping */
-  
-  /* Cool Gradient Animation - High Contrast */
+  margin-bottom: 2.5rem; 
+  padding-bottom: 0.2em; 
   background: linear-gradient(
     90deg, 
     #ffffff 0%, 
@@ -169,10 +167,8 @@ const footerLinks = [
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  /* Animation handled by GSAP */
+  
 }
-
-/* Removed @keyframes text-flow since we use GSAP now */
 
 .cta-text {
   font-size: 1.2rem;
@@ -199,13 +195,13 @@ const footerLinks = [
   background: #f8fafc;
 }
 
-/* Divider */
+
 .footer-divider {
   border-color: rgba(255, 255, 255, 0.1);
   margin-bottom: 40px;
 }
 
-/* Brand */
+
 .brand-text {
   font-size: 1.5rem;
   font-weight: 700;
@@ -213,7 +209,7 @@ const footerLinks = [
   letter-spacing: -0.5px;
 }
 
-/* Social Links */
+
 .social-link {
   color: rgba(255, 255, 255, 0.6);
   font-size: 1.2rem;
@@ -224,7 +220,6 @@ const footerLinks = [
   color: white;
 }
 
-/* Footer Nav */
 .footer-nav-link {
   color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
@@ -244,12 +239,12 @@ const footerLinks = [
 /* Responsive */
 @media (max-width: 768px) {
   .footer-wrapper {
-    margin-top: 0; /* Remove margin to let waves overlap content */
+    margin-top: 0; 
   }
   
   .waves-container {
     height: 60px;
-    top: -59px; /* Slightly adjust to avoid gap line */
+    top: -59px; 
   }
 
   .cta-title {

@@ -10,6 +10,7 @@ const links = ref([
   { name: 'Home', path: '/' },
   { name: 'Services', path: '/service' },
   { name: 'Portfolio', path: '/portfolio' },
+  { name: '3D Camera', path: '/camera' },
   { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' }
 ]);
